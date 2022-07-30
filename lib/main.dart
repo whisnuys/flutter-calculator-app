@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 import './constant.dart';
 
 void main() {
@@ -25,31 +26,31 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  var result = '0.0';
+  var result = "0.0";
   double resultFontSize = 66;
   double userFontSize = 40;
 
   List<String> buttons = [
-    'AC',
-    '+/-',
-    '%',
-    '/',
-    '7',
-    '8',
-    '9',
-    'x',
-    '4',
-    '5',
-    '6',
-    '-',
-    '1',
-    '2',
-    '3',
-    '+',
-    '.',
-    '0',
-    'C',
-    '=',
+    "AC",
+    "+/-",
+    "%",
+    "/",
+    "7",
+    "8",
+    "9",
+    "x",
+    "4",
+    "5",
+    "6",
+    "-",
+    "1",
+    "2",
+    "3",
+    "+",
+    ".",
+    "0",
+    "C",
+    "=",
   ];
 
   // initialize the input controller
@@ -99,12 +100,13 @@ class _CalculatorState extends State<Calculator> {
                       style: TextStyle(
                         fontSize: userFontSize,
                         decoration: TextDecoration.none,
+                        color: whiteColor.withOpacity(0.50),
                       ),
                       decoration: InputDecoration(
                         enabledBorder: InputBorder.none,
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
-                        hintText: '0.0',
+                        hintText: "0.0",
                         hintStyle: TextStyle(
                           color: whiteColor.withOpacity(0.50),
                         ),
@@ -112,7 +114,7 @@ class _CalculatorState extends State<Calculator> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 16),
+                      margin: const EdgeInsets.only(top: 16),
                       child: Text(
                         result,
                         style: TextStyle(
@@ -151,7 +153,15 @@ class _CalculatorState extends State<Calculator> {
     );
   }
 
-  void doCalculation() {}
+  void doCalculation() {
+    var expression = inputController.text;
+    expression = expression.replaceAll("x", "*");
+    Parser p = Parser();
+    Expression mathExpression = p.parse(expression);
+    ContextModel cm = ContextModel();
+    double eval = mathExpression.evaluate(EvaluationType.REAL, cm);
+    result = eval.toString();
+  }
 
   Widget inputButton(String text) {
     Color btnColor;
@@ -185,7 +195,31 @@ class _CalculatorState extends State<Calculator> {
     }
     return InkWell(
       borderRadius: BorderRadius.circular(24),
-      onTap: () {},
+      onTap: () {
+        setState(() {
+          if (inputController.text.length >= 6) {
+            resultFontSize = 36;
+            userFontSize = 16;
+          } else {
+            resultFontSize = 66;
+            userFontSize = 40;
+          }
+
+          if (text == "AC") {
+            inputController.text = "";
+            result = "0.0";
+          } else if (text == "C") {
+            inputController.text = inputController.text
+                .substring(0, inputController.text.length - 1);
+            if (inputController.text.isEmpty) {
+              result = "0.0";
+            }
+          } else if (text == "=") {
+          } else {
+            inputController.text = inputController.text + text;
+          }
+        });
+      },
       child: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.all(
