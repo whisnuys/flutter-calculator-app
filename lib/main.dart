@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
-import './constant.dart';
+import 'package:flutter_switch/flutter_switch.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -29,10 +29,20 @@ class _CalculatorState extends State<Calculator> {
   var result = "0.0";
   double resultFontSize = 66;
   double userFontSize = 40;
+  bool isSwitched = false;
+  late Color textColor;
+
+  // color
+  Color bgColor = const Color(0xFF17171C);
+  Color btnPrimary = const Color(0xFF2E2F38);
+  Color btnGrey = const Color(0xFF4E505F);
+  Color btnBlueDark = const Color(0xFF4B5EFC);
+  Color whiteColor = const Color(0xFFFFFFFF);
+  Color blackColor = const Color(0xFF000000);
 
   List<String> buttons = [
     "AC",
-    "+/-",
+    "x²",
     "%",
     "/",
     "7",
@@ -71,10 +81,28 @@ class _CalculatorState extends State<Calculator> {
     super.dispose();
   }
 
+  void toggleSwitch(bool value) {
+    if (isSwitched == false) {
+      setState(() {
+        isSwitched = true;
+        bgColor = const Color(0xFFF1F2F3);
+        btnPrimary = whiteColor;
+        btnGrey = const Color(0xFFD2D3DA);
+      });
+    } else {
+      setState(() {
+        isSwitched = false;
+        bgColor = const Color(0xFF17171C);
+        btnPrimary = const Color(0xFF2E2F38);
+        btnGrey = const Color(0xFF4E505F);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgDarkColor,
+      backgroundColor: bgColor,
       body: Container(
         padding: const EdgeInsets.only(
           top: 40,
@@ -93,6 +121,26 @@ class _CalculatorState extends State<Calculator> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    // Switch(value: isSwitched, onChanged: toggleSwitch),
+                    FlutterSwitch(
+                      value: isSwitched,
+                      onToggle: toggleSwitch,
+                      padding: 6.0,
+                      inactiveIcon: Image.asset(
+                        "assets/moon.png",
+                        width: 24,
+                        height: 24,
+                      ),
+                      inactiveToggleColor: const Color(0xFF4E505F),
+                      inactiveColor: const Color(0xFF2E2F38),
+                      activeIcon: Image.asset(
+                        "assets/sun.png",
+                        width: 24,
+                        height: 24,
+                      ),
+                      activeToggleColor: whiteColor,
+                      activeColor: const Color(0xFFD2D3DA),
+                    ),
                     TextField(
                       textAlign: TextAlign.right,
                       controller: inputController,
@@ -100,7 +148,9 @@ class _CalculatorState extends State<Calculator> {
                       style: TextStyle(
                         fontSize: userFontSize,
                         decoration: TextDecoration.none,
-                        color: whiteColor.withOpacity(0.50),
+                        color: isSwitched
+                            ? blackColor.withOpacity(0.50)
+                            : whiteColor.withOpacity(0.50),
                       ),
                       decoration: InputDecoration(
                         enabledBorder: InputBorder.none,
@@ -108,7 +158,9 @@ class _CalculatorState extends State<Calculator> {
                         focusedBorder: InputBorder.none,
                         hintText: "0.0",
                         hintStyle: TextStyle(
-                          color: whiteColor.withOpacity(0.50),
+                          color: isSwitched
+                              ? blackColor.withOpacity(0.50)
+                              : whiteColor.withOpacity(0.50),
                         ),
                         hintTextDirection: TextDirection.rtl,
                       ),
@@ -119,7 +171,7 @@ class _CalculatorState extends State<Calculator> {
                         result,
                         style: TextStyle(
                           fontSize: resultFontSize,
-                          color: whiteColor,
+                          color: isSwitched ? blackColor : whiteColor,
                         ),
                       ),
                     ),
@@ -168,36 +220,45 @@ class _CalculatorState extends State<Calculator> {
     switch (text) {
       case '=':
         btnColor = btnBlueDark;
+        textColor = whiteColor;
         break;
       case '+':
         btnColor = btnBlueDark;
+        textColor = whiteColor;
         break;
       case '-':
         btnColor = btnBlueDark;
+        textColor = whiteColor;
         break;
       case 'x':
         btnColor = btnBlueDark;
+        textColor = whiteColor;
         break;
       case '/':
         btnColor = btnBlueDark;
+        textColor = whiteColor;
         break;
       case '%':
-        btnColor = btnGreyDark;
+        btnColor = btnGrey;
+        textColor = isSwitched ? blackColor : whiteColor;
         break;
-      case '+/-':
-        btnColor = btnGreyDark;
+      case 'x²':
+        btnColor = btnGrey;
+        textColor = isSwitched ? blackColor : whiteColor;
         break;
       case 'AC':
-        btnColor = btnGreyDark;
+        btnColor = btnGrey;
+        textColor = isSwitched ? blackColor : whiteColor;
         break;
       default:
-        btnColor = btnPrimaryDark;
+        btnColor = btnPrimary;
+        textColor = isSwitched ? blackColor : whiteColor;
     }
     return InkWell(
       borderRadius: BorderRadius.circular(24),
       onTap: () {
         setState(() {
-          if (inputController.text.length >= 6) {
+          if (inputController.text.length >= 8) {
             resultFontSize = 36;
             userFontSize = 16;
           } else {
@@ -214,7 +275,10 @@ class _CalculatorState extends State<Calculator> {
             if (inputController.text.isEmpty) {
               result = "0.0";
             }
+          } else if (text == "x²") {
+            inputController.text = "${inputController.text}^2";
           } else if (text == "=") {
+            inputController.text;
           } else {
             inputController.text = inputController.text + text;
           }
@@ -234,7 +298,7 @@ class _CalculatorState extends State<Calculator> {
         child: Text(
           text,
           style: TextStyle(
-            color: whiteColor,
+            color: textColor,
             fontSize: 24,
           ),
         ),
