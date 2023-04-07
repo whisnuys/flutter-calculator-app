@@ -2,5 +2,4 @@
 
 Simple Calculator App with flutter
 
-![Dark theme](/assets/dark.png)
-![Light theme](/assets/light.png)
+![Screenshots](/assets/display.png)
